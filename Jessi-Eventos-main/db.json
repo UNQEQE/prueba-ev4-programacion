@@ -1,0 +1,15 @@
+{
+  "personas": [
+    {
+      "rut": "22.018.326-2",
+      "nombre": "Elian Cardenas",
+      "correo": "elian.cardenas@gmail.com",
+      "telefono": "+56912345678",
+      "fecha": "2000-12-12",
+      "edad": "25 años",
+      "id": "DE7rRJhc0q8"
+    }
+  ],
+  "productos": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}
