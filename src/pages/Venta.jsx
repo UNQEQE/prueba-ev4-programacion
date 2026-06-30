@@ -13,11 +13,8 @@ export default function Venta({ cart, setCart, setPage, indicadores, setIndicado
   const total = cart.reduce((s, i) => s + i.precio, 0);
   const conv  = total > 0 ? convertirMontos(total, indicadores) : null;
 
-  useEffect(() => {
-    if (cart.length === 0 && !msg) {
-      setMsg({ type: 'info', text: 'Tu carrito está vacío.' });
-    }
-  }, []);
+  // No se requiere useEffect para el carrito vacío, se maneja condicionalmente en el renderizado
+
 
   const submit = () => {
     setMsg(null);
@@ -47,11 +44,36 @@ export default function Venta({ cart, setCart, setPage, indicadores, setIndicado
 
           {/* Resumen de precio */}
           <div style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.2)', borderRadius: 12, padding: '14px 18px', marginBottom: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.05rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.05rem', borderBottom: cart.length > 0 ? '1px solid rgba(255,255,255,.15)' : 'none', paddingBottom: cart.length > 0 ? 10 : 0, marginBottom: cart.length > 0 ? 10 : 0 }}>
               <span>Total del Pedido:</span>
               <span>${total.toLocaleString('es-CL')}</span>
             </div>
-            <small style={{ opacity: .6, fontStyle: 'italic', fontSize: 13 }}>* Basado en tu selección.</small>
+
+            {/* Lista de productos con opción de eliminar */}
+            {cart.length > 0 && (
+              <div style={{ marginBottom: 12 }}>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {cart.map((item, idx) => (
+                    <li key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, marginBottom: 8, background: 'rgba(255,255,255,.03)', padding: '6px 10px', borderRadius: 8 }}>
+                      <span>{item.nombre} <span style={{ opacity: .6 }}>(${item.precio.toLocaleString('es-CL')})</span></span>
+                      <button
+                        onClick={() => {
+                          const updated = cart.filter((_, i) => i !== idx);
+                          setCart(updated);
+                          saveCart(updated);
+                        }}
+                        title="Eliminar producto"
+                        style={{ background: 'transparent', border: 'none', color: '#ff7777', cursor: 'pointer', padding: '2px 6px', fontSize: 14, fontWeight: 'bold' }}
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <small style={{ display: 'block', opacity: .6, fontStyle: 'italic', fontSize: 13, marginBottom: 8 }}>* Basado en tu selección.</small>
 
             {/* Conversiones */}
             {conv ? (
@@ -109,14 +131,17 @@ export default function Venta({ cart, setCart, setPage, indicadores, setIndicado
           </button>
 
           {msg && (
-            <div className={
-              msg.type === 'error' ? 'alert-error' :
-              msg.type === 'info'  ? 'alert-info'  : 'alert-success'
-            } style={{ marginTop: 16 }}>
+            <div className={msg.type === 'error' ? 'alert-error' : 'alert-success'} style={{ marginTop: 16 }}>
               {msg.text}
-              {msg.type === 'info' && (
-                <> <button className="btn-outline" style={{ marginLeft: 10, padding: '4px 12px', fontSize: 13 }} onClick={() => setPage('productos')}>Ver Productos</button></>
-              )}
+            </div>
+          )}
+
+          {cart.length === 0 && (!msg || msg.type !== 'success') && (
+            <div className="alert-info" style={{ marginTop: 16 }}>
+              Tu carrito está vacío.
+              <button className="btn-outline" style={{ marginLeft: 10, padding: '4px 12px', fontSize: 13 }} onClick={() => setPage('productos')}>
+                Ver Productos
+              </button>
             </div>
           )}
         </div>

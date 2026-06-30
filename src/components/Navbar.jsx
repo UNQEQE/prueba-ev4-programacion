@@ -6,7 +6,7 @@ export default function Navbar({ page, setPage, cartCount, session, onLogout }) 
     { id: 'contacto',       label: 'Contacto' },
     { id: 'terminos',       label: 'Términos' },
     { id: 'requerimientos', label: 'Requerimientos' },
-    { id: 'venta',          label: '🛒' },
+    { id: 'carrito',        label: `🛒${cartCount > 0 ? ` (${cartCount})` : ''}` },
   ];
 
   return (
