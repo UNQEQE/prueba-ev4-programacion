@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { validateRut, formatRut, formatRutInput, cleanRut, calcEdad, hashRut } from '../utils/rut';
+import { getPersonas, savePersonas } from '../utils/storage';
 
 const emptyForm = { rut: '', nombre: '', correo: '', telefono: '', fecha: '' };
 
@@ -10,6 +11,7 @@ export default function Personas() {
   const [msg, setMsg]             = useState(null);
   const [edad, setEdad]           = useState(null);
   const [errors, setErrors]       = useState({});
+  const [useLocalStorage, setUseLocalStorage] = useState(false);
 
   useEffect(() => {
     cargarPersonas();
@@ -21,13 +23,22 @@ export default function Personas() {
       if (res.ok) {
         const data = await res.json();
         setPersonas(data);
+        setUseLocalStorage(false);
       } else {
         console.error('Error al cargar personas: Status ' + res.status);
+        fallbackToLocalStorage();
       }
     } catch (e) {
       console.error('Error de red al cargar personas:', e);
-      setMsg({ type: 'error', text: 'Error al conectar con la base de datos (json-server).' });
+      fallbackToLocalStorage();
     }
+  };
+
+  const fallbackToLocalStorage = () => {
+    setUseLocalStorage(true);
+    const localData = getPersonas();
+    setPersonas(localData);
+    setMsg({ type: 'info', text: 'ℹ️ Usando almacenamiento local (json-server no disponible).' });
   };
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
@@ -120,6 +131,33 @@ export default function Personas() {
     const edadStr = edad !== null ? `${edad} años` : '';
     const persona = { ...form, rut: formatRut(form.rut), edad: edadStr };
 
+    if (useLocalStorage) {
+      if (editId !== null) {
+        // ACTUALIZAR (Local)
+        const updated = personas.map(p => p.id === editId ? { ...persona, id: editId } : p);
+        savePersonas(updated);
+        setPersonas(updated);
+        setMsg({ type: 'success', text: '✅ Persona actualizada (Modo local)' });
+        setForm(emptyForm);
+        setEditId(null);
+        setEdad(null);
+      } else {
+        // AGREGAR (Local)
+        if (personas.some(p => cleanRut(p.rut) === cleanRut(form.rut))) {
+          setMsg({ type: 'error', text: '❌ Este RUT ya está registrado' });
+          return;
+        }
+        const newPersona = { ...persona, id: Date.now() };
+        const updated = [...personas, newPersona];
+        savePersonas(updated);
+        setPersonas(updated);
+        setMsg({ type: 'success', text: '✅ Persona agregada (Modo local)' });
+        setForm(emptyForm);
+        setEdad(null);
+      }
+      return;
+    }
+
     try {
       if (editId !== null) {
         // ACTUALIZAR (PUT)
@@ -173,6 +211,19 @@ export default function Personas() {
 
   const eliminar = async (persona) => {
     if (!confirm('¿Eliminar esta persona de la base de datos?')) return;
+    if (useLocalStorage) {
+      const updated = personas.filter(p => p.id !== persona.id);
+      savePersonas(updated);
+      setPersonas(updated);
+      setMsg({ type: 'success', text: '✅ Persona eliminada (Modo local)' });
+      if (editId === persona.id) {
+        setForm(emptyForm);
+        setEditId(null);
+        setEdad(null);
+      }
+      return;
+    }
+
     try {
       const res = await fetch(`http://localhost:3000/personas/${persona.id}`, {
         method: 'DELETE'
@@ -282,7 +333,10 @@ export default function Personas() {
             </div>
 
             {msg && (
-              <div className={msg.type === 'error' ? 'alert-error' : 'alert-success'} style={{ marginTop: 14 }}>
+              <div className={
+                msg.type === 'error' ? 'alert-error' :
+                msg.type === 'info'  ? 'alert-info'  : 'alert-success'
+              } style={{ marginTop: 14 }}>
                 {msg.text}
               </div>
             )}
