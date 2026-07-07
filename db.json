@@ -10,6 +10,37 @@
       "id": "DE7rRJhc0q8"
     }
   ],
-  "productos": [],
+  "productos": [
+    {
+      "id": "1",
+      "emoji": "🎭",
+      "tag": "Más Popular",
+      "tagColor": "#ff7a3d",
+      "name": "Foto Cabina Espejo",
+      "desc": "Foto cabina con espejo para capturar momentos únicos.",
+      "price": 200000,
+      "image": "espejo.png"
+    },
+    {
+      "id": "2",
+      "emoji": "🔮",
+      "tag": "Popular",
+      "tagColor": "#e8b94f",
+      "name": "Fotocabina + Domo",
+      "desc": "Fotocabina con domo para crear un ambiente único.",
+      "price": 120000,
+      "image": "domo.png"
+    },
+    {
+      "id": "3",
+      "emoji": "🌀",
+      "tag": "Popular",
+      "tagColor": "#e8b94f",
+      "name": "Cabina 360°",
+      "desc": "Videos con vista de 360 grados para tu evento.",
+      "price": 170000,
+      "image": "360.png"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

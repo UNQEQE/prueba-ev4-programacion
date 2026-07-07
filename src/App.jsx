@@ -12,6 +12,9 @@ import Venta          from './pages/Venta';
 import Contacto       from './pages/Contacto';
 import Requerimientos from './pages/Requerimientos';
 import Terminos       from './pages/Terminos';
+import FAQ            from './pages/FAQ';
+import AdminProductos from './pages/AdminProductos';
+import ManualUsuario  from './pages/ManualUsuario';
 
 import { getCart, saveCart, getSession, clearSession, getIndicadores } from './utils/storage';
 
@@ -57,6 +60,9 @@ export default function App() {
       case 'contacto':       return <Contacto />;
       case 'requerimientos': return <Requerimientos />;
       case 'terminos':       return <Terminos />;
+      case 'faq':            return <FAQ />;
+      case 'admin-productos':return <AdminProductos />;
+      case 'manual':         return <ManualUsuario />;
       case 'login':          return <Auth onLogin={handleLogin} />;
       default:               return <Inicio setPage={setPage} session={session} cartCount={cart.length} />;
     }
@@ -71,7 +77,37 @@ export default function App() {
         session={session}
         onLogout={handleLogout}
       />
-      {renderPage()}
+      <div style={{ paddingBottom: 60 }}>
+        {renderPage()}
+      </div>
+
+      {/* CUADRO FLOTANTE DEL MANUAL DE USUARIO */}
+      <button 
+        onClick={() => setPage('manual')}
+        style={{
+          position: 'fixed',
+          bottom: 20,
+          left: 20,
+          background: 'rgba(255, 122, 61, 0.9)', // Naranja (--ember)
+          color: '#fff',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: 12,
+          padding: '12px 18px',
+          fontSize: '14px',
+          fontWeight: 600,
+          cursor: 'pointer',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          backdropFilter: 'blur(10px)'
+        }}
+        title="Ver Manual de Usuario"
+      >
+        <span style={{ fontSize: '1.2rem' }}>📘</span> 
+        <span>Manual de Usuario</span>
+      </button>
     </>
   );
 }

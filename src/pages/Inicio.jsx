@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { hashRut } from '../utils/rut';
+import Collapsible from '../components/Collapsible';
 import hero1 from '../assets/evento1.jpg';
 import hero2 from '../assets/evento2.jpg';
 import hero3 from '../assets/evento3.jpg';
@@ -76,7 +77,6 @@ const faqs = [
 export default function Inicio({ setPage, session, cartCount }) {
   const [current, setCurrent] = useState(0);
   const [selectedService, setSelectedService] = useState(null);
-  const [openFaq, setOpenFaq] = useState(null);
 
   useEffect(() => {
     const t = setInterval(() => setCurrent(p => (p + 1) % slides.length), 4500);
@@ -165,63 +165,11 @@ export default function Inicio({ setPage, session, cartCount }) {
       <div className="container" style={{ padding: '20px 20px 60px', maxWidth: 800 }}>
         <h2 style={{ textAlign: 'center', marginBottom: 30, fontSize: '1.8rem' }}>Preguntas Frecuentes</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {faqs.map((faq, index) => {
-            const isOpen = openFaq === index;
-            return (
-              <div 
-                key={index} 
-                className="glass" 
-                style={{ 
-                  borderRadius: 12, 
-                  overflow: 'hidden', 
-                  border: isOpen ? '1px solid var(--gold)' : '1px solid rgba(232, 185, 79, 0.2)',
-                  transition: 'border-color 0.3s ease'
-                }}
-              >
-                <div 
-                  onClick={() => setOpenFaq(isOpen ? null : index)}
-                  style={{
-                    padding: '18px 24px',
-                    background: 'rgba(28, 39, 64, 0.4)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 16,
-                    userSelect: 'none'
-                  }}
-                >
-                  <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: isOpen ? 'var(--gold)' : '#fff', transition: 'color 0.2s' }}>
-                    {faq.q}
-                  </h4>
-                  <span style={{ 
-                    color: 'var(--gold)', 
-                    fontSize: 14, 
-                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.3s ease',
-                    display: 'inline-block'
-                  }}>
-                    ▼
-                  </span>
-                </div>
-                {isOpen && (
-                  <div 
-                    style={{ 
-                      padding: '20px 24px', 
-                      fontSize: '14.5px', 
-                      lineHeight: 1.6, 
-                      color: '#e4e6eb',
-                      background: 'rgba(14, 19, 32, 0.2)',
-                      borderTop: '1px solid rgba(232, 185, 79, 0.1)',
-                      animation: 'fadeIn 0.2s ease-out'
-                    }}
-                  >
-                    {faq.a}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {faqs.map((faq, index) => (
+            <Collapsible key={index} title={faq.q}>
+              {faq.a}
+            </Collapsible>
+          ))}
         </div>
       </div>
 

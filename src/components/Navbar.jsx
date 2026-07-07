@@ -3,9 +3,10 @@ export default function Navbar({ page, setPage, cartCount, session, onLogout }) 
     { id: 'inicio',         label: 'Inicio' },
     { id: 'personas',       label: 'Personas' },
     { id: 'productos',      label: 'Productos' },
+    { id: 'admin-productos',label: 'Gestión Prod.' },
+    { id: 'faq',            label: 'FAQ' },
     { id: 'contacto',       label: 'Contacto' },
     { id: 'terminos',       label: 'Términos' },
-    { id: 'requerimientos', label: 'Requerimientos' },
     { id: 'carrito',        label: `🛒${cartCount > 0 ? ` (${cartCount})` : ''}` },
   ];
 

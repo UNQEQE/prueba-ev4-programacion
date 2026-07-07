@@ -26,11 +26,26 @@ export default function Productos({ onAdd, setPage }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [productosDB, setProductosDB] = useState([]);
+
   useEffect(() => {
     if (!indicadores) {
       loadIndicadores();
     }
+    loadProductos();
   }, []);
+
+  const loadProductos = async () => {
+    try {
+      const res = await fetch('http://localhost:3000/productos');
+      if (res.ok) {
+        const data = await res.json();
+        setProductosDB(data);
+      }
+    } catch (e) {
+      console.error('Error al cargar productos desde la base de datos:', e);
+    }
+  };
 
   const loadIndicadores = async () => {
     setLoading(true);
@@ -89,27 +104,35 @@ export default function Productos({ onAdd, setPage }) {
         {error && <div className="alert-error" style={{ marginBottom: 20 }}>{error}</div>}
 
         <div className="grid-3">
-          {PRODUCTS.map(p => (
-            <div key={p.name} className="glass" style={{ display: 'flex', flexDirection: 'column' }}>
+          {(productosDB.length > 0 ? productosDB : PRODUCTS).map(p => {
+            let img = p.image;
+            if (p.image === 'espejo.png') img = espejoImg;
+            if (p.image === 'domo.png') img = domoImg;
+            if (p.image === '360.png') img = tres60Img;
+            
+            return (
+            <div key={p.id || p.name} className="glass" style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{
                 height: 200, background: 'rgba(255, 122, 61, 0.12)',
                 borderRadius: '18px 18px 0 0', overflow: 'hidden',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                {p.image ? (
-                  <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                {img ? (
+                  <img src={img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <span style={{ fontSize: '5rem' }}>{p.emoji}</span>
                 )}
               </div>
               <div style={{ padding: '20px 20px 0', flexGrow: 1, textAlign: 'center' }}>
-                <span style={{
-                  background: `${p.tagColor}33`, border: `1px solid ${p.tagColor}`,
-                  color: '#fff', borderRadius: 20, padding: '3px 10px',
-                  fontSize: 12, fontWeight: 600, display: 'inline-block', marginBottom: 10,
-                }}>
-                  {p.tag}
-                </span>
+                {p.tag && (
+                  <span style={{
+                    background: `${p.tagColor}33`, border: `1px solid ${p.tagColor}`,
+                    color: '#fff', borderRadius: 20, padding: '3px 10px',
+                    fontSize: 12, fontWeight: 600, display: 'inline-block', marginBottom: 10,
+                  }}>
+                    {p.tag}
+                  </span>
+                )}
                 <h5 style={{ marginBottom: 8, fontSize: '1.05rem' }}>{p.name}</h5>
                 <p style={{ opacity: .7, fontSize: 14, marginBottom: 12 }}>{p.desc}</p>
                 <p style={{ fontWeight: 700, fontSize: '1.3rem' }}>{formatPrice(p.price)}</p>
@@ -120,7 +143,8 @@ export default function Productos({ onAdd, setPage }) {
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
 
           {COTIZACIONES.map(c => (
             <div key={c.name} className="glass" style={{ display: 'flex', flexDirection: 'column' }}>
